@@ -1,8 +1,3 @@
-
-# coding: utf-8
-
-# In[26]:
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import ndimage as ndi
@@ -11,7 +6,11 @@ import csv
 import os
 
 class PinDoseMap:
-    """A class to take in a directory of calculated dose maps.
+    """A class to represent a Pinnacle planar dose map. 
+    Attributes: 
+    	self.hdr is dictionary of header data
+    	self.itrp_dose_array is numpy array of planar dose from Pinnacle
+    	
     Assume that maps are at 100cm SPD, and 5cm deep as per local
     dose calc conventions for IMRT QA"""
         # TODO open file once and pass around file handle
@@ -19,7 +18,7 @@ class PinDoseMap:
         assert os.path.exists(my_file), "check path you gave is correct and exists: %s" % my_file
         
         self.map_file = my_file
-        self.hdr = None
+        self.hdr = None		#dictionary of planar dose header params (like pat name)
         self.x_pos = None
         self.y_pos = None
         self.raw_dose_array = None
@@ -28,7 +27,7 @@ class PinDoseMap:
         self.get_dose_map(self.map_file)
         
     def get_hdr(self, map_file):
-        p = dict()
+        p = dict() 
         
         with open(map_file, "r") as fh:
             
@@ -42,7 +41,7 @@ class PinDoseMap:
     
     def get_dose_map(self, map_file):
         rawdat = np.genfromtxt(map_file, delimiter=',', skiprows=11,
-                               missing_values='')
+                               missing_values='') # skip first 11 rows of header data
         self.y_pos = rawdat[1: ,0] #get everything after first position ([1: )in 1st col ( ,0])   
         self.x_pos = rawdat[0, 1:-1] #in first row ([0, ), get all except first and last ( ,1:-1])
         self.raw_dose_array = rawdat[1:, 1:-1]  # here is the dose array
