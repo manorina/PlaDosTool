@@ -20,7 +20,8 @@ class PinDoseMapList:
                 
 				for f in os.listdir(my_dir):
 					print("entry: %s" % f)
-					self.populate_list(my_dir)
+					
+				self.populate_list(my_dir)
 			else:
 				print ("check this path exists: %s" % my_dir)
 		else:
@@ -28,12 +29,26 @@ class PinDoseMapList:
 			print("Pinnacle planar dose folder is %s" % self.pin_dose_folder)
 			self.populate_list(self.pin_dose_folder)
 		
+
+        
 	def populate_list(self, folder):
+		missed = 0
 		for f in os.listdir(folder):
 			with open(os.path.join(folder, f), "r") as fh:
 				if "Version" in fh.readline(): #"Version" in first line
 											   # marks a Pinnacle Planar dose text file -
 											   # only append these files to our list 
-					self.pdm_list.append(os.path.join(folder,f))
-					print("File is: ", f)
+					g = self.get_G_Ang(f)
+					x = pdm.PinDoseMap(os.path.join(folder,f), g)
+					self.pdm_list.append(x)
+					print('File is: {0} and gant is {1}'.format(f, g))
+				else:
+					missed+=1
+					
+				print("Skipped %d files. If non-zero, check the Pinnacle planar dose folder" % missed)
+				
+	def get_G_Ang(self, map_file):
+		tmp = map_file.split('_') #FIXME poor implementation - requires angle to be in filenam
+		print (tmp[1])
+		return tmp[1]
             

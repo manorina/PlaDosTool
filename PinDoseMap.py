@@ -14,17 +14,19 @@ class PinDoseMap:
     Assume that maps are at 100cm SPD, and 5cm deep as per local
     dose calc conventions for IMRT QA"""
         # TODO open file once and pass around file handle
-    def __init__(self, my_file):
+    def __init__(self, my_file, ga):
         assert os.path.exists(my_file), "check path you gave is correct and exists: %s" % my_file
         
         self.map_file = my_file
         self.hdr = None		#dictionary of planar dose header params (like pat name)
+        self.gant_angle = ga
         self.x_pos = None
         self.y_pos = None
         self.raw_dose_array = None
         self.itrp_dose_array = None
         self.get_hdr(self.map_file)
         self.get_dose_map(self.map_file)
+        # self.get_gant_angle(self.map_file)
         
     def get_hdr(self, map_file):
         p = dict() 
@@ -54,6 +56,10 @@ class PinDoseMap:
         ax1 = fig.add_subplot(111)
         ax1.set_title('TestPinFlu')
         plt.imshow(self.itrp_dose_array)
+        
+    def get_gant_angle(self, map_file):
+        tmp = map_file.split('_') #FIXME poor implementation - requires angle to be in filenam
+        self.gant_angle = tmp[1]
         
         
 
